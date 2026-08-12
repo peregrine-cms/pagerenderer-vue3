@@ -156,8 +156,10 @@ pagerendervue3/
 │           │   └── peregrineApp.js # Core Vue 3 app (ES Module)
 │           ├── css/
 │           │   └── components.css  # Base styles
-│           └── vue/
-│               └── vue.global.js   # Vue 3 runtime
+│           ├── vue/
+│           │   └── vue.global.prod.js  # Vue 3 runtime (FULL build)
+│           └── axios/
+│               └── axios.min.js    # used by peregrineApp + themes
 │
 ├── scripts/
 │   └── buildvue3.js                # Vue SFC compiler (Rollup + esbuild)
@@ -235,6 +237,40 @@ The build script (`buildvue3.js`) compiles `.vue` files to IIFE modules.
 | Module Format | Mixed IIFE/ES | ES Modules |
 | Helpers | `Vue.prototype.$helper` | `app.config.globalProperties` + inject |
 | Build | Rollup + Buble | Rollup + esbuild (faster) |
+| Global registration | `Vue.component()`, `Vue.mixin()` | `loadComponent()`, `registerAppExtension()` |
+
+## Theme Extension Points
+
+Vue 3 removed the global `Vue` API, so a theme felib can no longer call
+`Vue.component()`, `Vue.mixin()` or assign to `Vue.prototype` — all three are
+app-scoped now, and this module owns the only app instance. Two hooks replace
+them.
+
+**Register a component** — define it on `window` under the `cmp` + CamelCase
+name the loader expects, then ask for it by its hyphenated name:
+
+```javascript
+window.cmpMyWidget = { props: ['model'], template: '<div>…</div>' }
+$peregrineApp.loadComponent('my-widget')
+```
+
+**Reach the app itself** — for mixins, directives or global properties:
+
+```javascript
+$peregrineApp.registerAppExtension(function (app) {
+  app.mixin({ mounted() { /* … */ } })
+  app.config.globalProperties.$myHelper = fn
+})
+```
+
+Called before the app is created (the normal case — theme felibs load ahead of
+`loadContentFrom`) the callback is queued and applied at `createApp`; called
+afterwards it runs immediately.
+
+**Add to `<head>`** — a theme's page component overrides `tracker-head.html`
+(favicons, verification tags, analytics, extra preloads). Note that
+`data-sly-use` locals do not propagate into a `data-sly-include`, so an override
+needing the Helper must re-declare it.
 
 ## Events
 

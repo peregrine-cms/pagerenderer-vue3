@@ -1,4 +1,26 @@
-<!-- Vue 3 renderer - load felib and initialize app -->
+<!-- Vue 3 renderer - load the runtime, then the felib, then initialize the app -->
+
+<!--/*
+    Vue itself, vendored, exactly as the Vue 2 renderer vendored vue.min.js.
+    Nothing else provides window.Vue: peregrineApp.js destructures it
+    (`const { createApp, ... } = Vue`) and every compiled component bundle is an
+    IIFE that takes it as its only argument. Without this the page throws
+    "Vue is not defined" before anything renders. (demo.html pulls the same
+    build from unpkg, which is fine for the demo and not for a deployment.)
+
+    The FULL build, not vue.runtime.global.prod.js: components shipped as a
+    `template:` string are compiled in the browser, and the runtime-only build
+    silently renders nothing for them.
+*/-->
+<script src="/etc/felibs/pagerendervue3/vue/vue.global.prod.js"></script>
+
+<!--/*
+    axios is used by peregrineApp for SPA navigation fetches and by themes for
+    their own data loading; it is a listed dependency of this package but was
+    never actually served.
+*/-->
+<script src="/etc/felibs/pagerendervue3/axios/axios.min.js"></script>
+
 <script src="/etc/felibs/pagerendervue3/js/peregrineApp.js"></script>
 <script src="/etc/felibs/pagerendervue3/js/pagerendervue3-structure-page.js"></script>
 <script src="/etc/felibs/pagerendervue3/js/pagerendervue3-structure-container.js"></script>

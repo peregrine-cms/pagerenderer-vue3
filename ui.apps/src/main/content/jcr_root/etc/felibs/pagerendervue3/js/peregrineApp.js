@@ -202,6 +202,8 @@ const pageState = reactive({
 // =============================================================================
 
 const registeredComponents = new Map();
+// Functions contributed by theme felibs, applied to the app once it exists.
+const appExtensions = [];
 let vueApp = null;
 let vueAppInstance = null;  // The mounted root component instance
 let appMounted = false;
@@ -767,13 +769,25 @@ function initVueApp() {
 
   // Provide context to all components
   vueApp.provide('peregrineApp', peregrineApp);
-  
+
   // Make helpers available globally
   vueApp.config.globalProperties.$helper = helpers;
 
   // Register all components that were loaded before app creation
   registeredComponents.forEach((component, name) => {
     vueApp.component(name, component);
+  });
+
+  // Hand the app to anything a theme registered via registerAppExtension().
+  // Vue 3 removed the global Vue API, so a theme felib has no other way to add
+  // a mixin, a directive or a global property -- those all belong to an app
+  // instance now, and this module owns the only one.
+  appExtensions.forEach((fn) => {
+    try {
+      fn(vueApp);
+    } catch (e) {
+      log.error('App extension failed:', e);
+    }
   });
 
   // Mount (uses existing DOM as template)
@@ -890,6 +904,35 @@ const peregrineApp = {
    * Initialize the Vue app manually
    */
   initApp: initVueApp,
+
+  /**
+   * Register a function to run against the Vue app instance.
+   *
+   * The replacement for Vue 2's global `Vue.mixin()` / `Vue.component()` /
+   * `Vue.prototype`, none of which exist in Vue 3 -- those are app-scoped now,
+   * and a theme felib cannot reach the app this module creates.
+   *
+   * Call it before the app is created (theme felibs load before
+   * loadContentFrom, so that is the normal case) and it is queued; call it
+   * afterwards and it is applied immediately.
+   *
+   *   $peregrineApp.registerAppExtension(function (app) {
+   *     app.mixin({ mounted() { ... } })
+   *     app.config.globalProperties.$myHelper = fn
+   *   })
+   */
+  registerAppExtension(fn) {
+    if (typeof fn !== 'function') return;
+    if (vueApp) {
+      try {
+        fn(vueApp);
+      } catch (e) {
+        log.error('App extension failed:', e);
+      }
+      return;
+    }
+    appExtensions.push(fn);
+  },
 
   /**
    * Domain helpers

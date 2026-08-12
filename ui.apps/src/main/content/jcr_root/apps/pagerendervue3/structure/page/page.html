@@ -25,6 +25,9 @@
 
     <sly data-sly-include="styles.html"></sly>
 
+    <!-- theme head extension point (favicons, verification tags, analytics) -->
+    <sly data-sly-include="tracker-head.html"></sly>
+
     <sly data-sly-use.page="com.peregrine.nodetypes.merge.PageMerge" />
     <script id="perPage" data-per-path="${resource.parent.path @ context='unsafe'}.html" type="application/json">${page.mergedForScript @ context = 'unsafe'}</script>
 
