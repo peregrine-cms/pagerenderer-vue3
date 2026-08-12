@@ -1,0 +1,437 @@
+/**
+ * Peregrine CMS - Vue 3 Page Renderer
+ * Modern Component Styles
+ * 
+ * A clean, modern design inspired by contemporary web aesthetics.
+ */
+
+/* ========================================
+   CSS Custom Properties (Theming)
+   ======================================== */
+:root {
+  /* Colors */
+  --color-primary: #667eea;
+  --color-primary-dark: #5a6fd6;
+  --color-secondary: #764ba2;
+  --color-text: #212529;
+  --color-text-muted: #6c757d;
+  --color-text-light: #999;
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  --gradient-subtle: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+  
+  /* Typography */
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-size-base: 1rem;
+  --font-size-sm: 0.875rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --line-height: 1.6;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.15);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* ========================================
+   Reset & Base
+   ======================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 400;
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ========================================
+   Typography
+   ======================================== */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+ul, ol {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+}
+
+li {
+  margin-bottom: var(--spacing-xs);
+}
+
+code {
+  font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: var(--color-border-light);
+  border-radius: var(--radius-sm);
+  color: var(--color-secondary);
+}
+
+/* ========================================
+   App Container
+   ======================================== */
+#peregrine-app {
+  min-height: 100vh;
+}
+
+/* ========================================
+   Page Component
+   ======================================== */
+.per-page {
+  min-height: 100vh;
+  padding: var(--spacing-xl);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   Hero Section (first component styling)
+   ======================================== */
+.per-hero {
+  background: var(--gradient-primary);
+  color: white;
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.per-hero h1 {
+  color: white;
+  margin-bottom: var(--spacing-md);
+}
+
+.per-hero p {
+  opacity: 0.9;
+  font-size: var(--font-size-lg);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ========================================
+   Card / Content Block
+   ======================================== */
+.per-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow var(--transition-normal);
+}
+
+.per-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.per-card h2,
+.per-card h3 {
+  color: var(--color-primary);
+}
+
+/* ========================================
+   Feature Card (gradient background)
+   ======================================== */
+.per-feature-card {
+  background: var(--gradient-primary);
+  color: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.per-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.per-feature-card h4 {
+  color: white;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.per-feature-card p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: var(--font-size-sm);
+}
+
+/* ========================================
+   Container Component
+   ======================================== */
+.per-container {
+  position: relative;
+  margin-bottom: var(--spacing-lg);
+}
+
+.per-container--styled {
+  background: var(--gradient-subtle);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+}
+
+/* Grid layout for container children */
+.per-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* ========================================
+   Navigation
+   ======================================== */
+.per-nav {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-border-light);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Apply flex to the inner div that contains the links */
+.per-nav > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.per-nav a {
+  color: var(--color-primary);
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.per-nav a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: none;
+}
+
+.per-nav a.active {
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: default;
+}
+
+/* ========================================
+   Base Component (Default Styling)
+   ======================================== */
+.per-base {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================
+   Empty State (Edit Mode)
+   ======================================== */
+.per-empty-state {
+  padding: var(--spacing-lg);
+  color: var(--color-text-light);
+  font-style: italic;
+  text-align: center;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-border-light);
+}
+
+/* ========================================
+   Drop Target / Placeholder (Edit Mode)
+   ======================================== */
+.per-drop-target {
+  border: 1px dashed var(--color-border);
+  clear: both;
+  padding: var(--spacing-sm);
+  margin: var(--spacing-sm) 0;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--color-text-light);
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  background: rgba(248, 248, 248, 0.9);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.per-drop-target:hover {
+  border-color: var(--color-primary);
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--color-primary);
+}
+
+.per-drop-target-empty {
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-xl);
+}
+
+/* ========================================
+   Loading States
+   ======================================== */
+.per-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+}
+
+.per-error {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: #dc3545;
+  background: #f8d7da;
+  border-radius: var(--radius-md);
+  margin: var(--spacing-lg);
+}
+
+/* ========================================
+   Utility: Hide while loading
+   ======================================== */
+.loadedHide {
+  display: none;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+.whilePeregrineLoads {
+  display: none;
+}
+
+.whilePeregrineLoads[v-cloak] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* ========================================
+   Inline Editing Support
+   ======================================== */
+#peregrine-app [data-per-inline] {
+  white-space: pre-wrap;
+  outline: none;
+}
+
+#peregrine-app [data-per-inline]:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ========================================
+   Responsive Adjustments
+   ======================================== */
+@media (max-width: 768px) {
+  :root {
+    --spacing-xl: 1.5rem;
+    --spacing-2xl: 2rem;
+  }
+  
+  .per-page {
+    padding: var(--spacing-md);
+  }
+  
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  .per-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .per-nav {
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+  }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+@media print {
+  .per-drop-target,
+  .per-empty-state {
+    display: none;
+  }
+  
+  .per-page {
+    padding: 0;
+  }
+  
+  .per-card,
+  .per-base {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}

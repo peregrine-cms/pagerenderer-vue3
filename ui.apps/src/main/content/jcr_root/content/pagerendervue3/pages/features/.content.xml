@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+  xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+  jcr:primaryType="per:Page">
+
+  <jcr:content
+    jcr:primaryType="per:PageContent"
+    sling:resourceType="pagerendervue3/structure/page"
+    jcr:title="Features"
+    brand="Peregrine CMS">
+
+    <hero jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-hero"
+      text="&lt;h1&gt;Features&lt;/h1&gt;&lt;p&gt;Explore the capabilities of the Vue 3 page renderer&lt;/p&gt;"/>
+
+    <nav jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-nav"
+      text="&lt;a href='/content/pagerendervue3/pages/index.html'&gt;Home&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/about.html'&gt;About&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/features.html' class='active'&gt;Features&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/contact.html'&gt;Contact&lt;/a&gt;"/>
+
+    <features1 jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/structure/container"
+      extraclasses="per-grid">
+
+      <card1 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;🚀 Composition API&lt;/h4&gt;&lt;p&gt;Write cleaner, more maintainable component logic using setup() and reactive primitives&lt;/p&gt;"/>
+
+      <card2 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;⚡ SPA Navigation&lt;/h4&gt;&lt;p&gt;Client-side navigation without full page reloads—instant content updates&lt;/p&gt;"/>
+
+      <card3 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;🔧 Modern Build&lt;/h4&gt;&lt;p&gt;Vite and Rollup compile Vue SFCs into optimized bundles&lt;/p&gt;"/>
+
+      <card4 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;📦 ES Modules&lt;/h4&gt;&lt;p&gt;Native browser module support for modern JavaScript development&lt;/p&gt;"/>
+
+    </features1>
+
+    <editor jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;Editor Integration&lt;/h2&gt;&lt;p&gt;The renderer integrates seamlessly with Peregrine's admin console:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Edit Mode Detection&lt;/strong&gt; — Components detect author mode via &lt;code&gt;inject('peregrineApp')&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Placeholder System&lt;/strong&gt; — Drop targets appear automatically when editing&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Inline Editing&lt;/strong&gt; — The &lt;code&gt;data-per-inline&lt;/code&gt; attribute enables in-place content editing&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Path Binding&lt;/strong&gt; — &lt;code&gt;data-per-path&lt;/code&gt; connects components to JCR nodes&lt;/li&gt;&lt;/ul&gt;"/>
+
+    <features2 jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/structure/container"
+      extraclasses="per-grid">
+
+      <card5 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;🎨 CSS Variables&lt;/h4&gt;&lt;p&gt;Theming support via CSS custom properties for easy customization&lt;/p&gt;"/>
+
+      <card6 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;📱 Responsive&lt;/h4&gt;&lt;p&gt;Mobile-first responsive design with fluid typography and layouts&lt;/p&gt;"/>
+
+      <card7 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;🔄 Lazy Loading&lt;/h4&gt;&lt;p&gt;Components registered on-demand as content loads into the page&lt;/p&gt;"/>
+
+      <card8 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;📝 TypeScript&lt;/h4&gt;&lt;p&gt;Full TypeScript support for type-safe component development&lt;/p&gt;"/>
+
+    </features2>
+
+    <helpers jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;Helper Utilities&lt;/h2&gt;&lt;p&gt;The &lt;code&gt;$helper&lt;/code&gt; object provides useful functions for component development:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;code&gt;isEmpty(field)&lt;/code&gt; — Check if a value is empty (handles rich text edge cases)&lt;/li&gt;&lt;li&gt;&lt;code&gt;areAllEmpty(...fields)&lt;/code&gt; — Check if all provided values are empty&lt;/li&gt;&lt;li&gt;&lt;code&gt;pathToUrl(path)&lt;/code&gt; — Convert content paths to URLs with .html extension&lt;/li&gt;&lt;/ul&gt;"/>
+
+  </jcr:content>
+
+</jcr:root>

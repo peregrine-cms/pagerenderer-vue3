@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspaceFilter version="1.0">
+    <filter root="/apps/pagerendervue3"/>
+    <filter root="/content/pagerendervue3"/>
+    <filter root="/etc/felibs/pagerendervue3"/>
+</workspaceFilter>

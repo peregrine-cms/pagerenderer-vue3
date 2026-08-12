@@ -1,0 +1,9 @@
+{ "fields":[
+  {
+    "type": "input",
+    "inputType": "text",
+    "label": "Extra Classes",
+    "model": "extraclasses",
+    "placeholder": "e.g. per-grid, per-container--styled"
+  }
+]}

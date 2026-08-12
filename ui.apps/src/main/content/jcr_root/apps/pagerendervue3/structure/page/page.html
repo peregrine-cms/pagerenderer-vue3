@@ -1,0 +1,77 @@
+<!DOCTYPE html><sly data-sly-use.helper="apps.pagerendervue3.structure.page.Helper"/>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <sly data-sly-list="${helper.model.prefetchDNS}"><link rel="preconnect" href="${item}"><link rel="dns-prefetch" href="${item}"></sly>
+    <sly data-sly-list="${helper.model.siteJS}"><link rel="preload" href="${item}" as="script"></sly>
+    <sly data-sly-list="${helper.model.siteCSS}"><link rel="preload" href="${item}" as="style"></sly>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#c0c0c0">
+    <meta name="description" content="${helper.model.description}">
+    <sly data-sly-test="${helper.model.metaRobots}"><meta name="robots" content="${helper.model.metaRobots}"/></sly>
+    <sly data-sly-test="${helper.model.ogTitle}"><meta property="og:title" content="${helper.model.ogTitle}"/></sly>
+    <sly data-sly-test="${helper.model.ogDescription}"><meta property="og:description" content="${helper.model.ogDescription}"/></sly>
+    <sly data-sly-test="${resource.ogType}"><meta property="og:type" content="${resource.ogType}"/></sly>
+    <sly data-sly-test="${helper.model.absOgImage}"><meta property="og:image" content="${helper.model.absOgImage}"/></sly>
+    <sly data-sly-test="${resource.ogImageAlt}"><meta property="og:image:alt" content="${resource.ogImageAlt}"/></sly>
+    <sly data-sly-test="${resource.ogUrl || helper.model.canonicalUrl}"><meta property="og:url" content="${resource.ogUrl ? resource.ogUrl : helper.model.canonicalUrl}"/></sly>
+
+    <title>${resource.jcr:title} | ${helper.model.brand}</title>
+    <link rel="canonical" href="${helper.model.canonicalUrl}"/>
+
+    <script>$peregrineSiteRoot = "${helper.siteRootPath @ context='unsafe'}"</script>
+
+    <sly data-sly-include="styles.html"></sly>
+
+    <sly data-sly-use.page="com.peregrine.nodetypes.merge.PageMerge" />
+    <script id="perPage" data-per-path="${resource.parent.path @ context='unsafe'}.html" type="application/json">${page.mergedForScript @ context = 'unsafe'}</script>
+
+    <style>
+        #peregrine-app [data-per-inline] {
+            white-space: pre-wrap;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .whilePeregrineLoads {
+            display: none;
+        }
+        .whilePeregrineLoads[v-cloak] {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="peregrine-app">
+    <span v-cloak>
+        <component v-bind:is="pageComponentName" v-bind:model="page"></component>
+    </span>
+    <span class="whilePeregrineLoads" v-cloak>
+        <img style="height:60px" data-sly-test="${helper.model.absOgImage}" src="${helper.model.absOgImage}" alt="${resource.jcr:title} ${helper.model.brand ? helper.model.brand : ''}"/>
+        <span data-sly-test="${!helper.model.absOgImage}">${resource.jcr:title} ${helper.model.brand ? helper.model.brand : ""}</span>
+    </span>
+</div>
+
+<sly data-sly-include="renderer-pre.html"></sly>
+
+<sly data-sly-list="${helper.model.siteJS}">
+    <script type="text/javascript" src="${item}"></script>
+</sly>
+
+<sly data-sly-include="renderer.html"></sly>
+
+<sly data-sly-list="${helper.model.siteCSS}"><link rel="stylesheet" href="${item}" type="text/css"></sly>
+
+<script>
+    var $perView = { view: 'preview' };
+    $peregrineApp.registerView($perView);
+    $peregrineApp.loadContentFrom("perPage", "${resource.parent.path @ context='unsafe'}.html", true);
+</script>
+</body>
+</html>

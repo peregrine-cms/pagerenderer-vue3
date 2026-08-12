@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+  xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+  jcr:primaryType="per:Page">
+
+  <jcr:content
+    jcr:primaryType="per:PageContent"
+    sling:resourceType="pagerendervue3/structure/page"
+    jcr:title="vue3 site template base">
+
+<!-- TODO: build nav and footer component for pagerendervue3
+<nav jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/nav"
+      brand="example"/>
+
+<footer jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/footer"/> -->
+
+  </jcr:content>
+
+</jcr:root>

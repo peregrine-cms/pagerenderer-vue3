@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+  xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+  jcr:primaryType="per:Page">
+
+  <jcr:content
+    jcr:primaryType="per:PageContent"
+    sling:resourceType="pagerendervue3/structure/page"
+    jcr:title="Contact"
+    brand="Peregrine CMS">
+
+    <hero jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-hero"
+      text="&lt;h1&gt;Contact Us&lt;/h1&gt;&lt;p&gt;Get in touch with the Peregrine CMS team&lt;/p&gt;"/>
+
+    <nav jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-nav"
+      text="&lt;a href='/content/pagerendervue3/pages/index.html'&gt;Home&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/about.html'&gt;About&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/features.html'&gt;Features&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/contact.html' class='active'&gt;Contact&lt;/a&gt;"/>
+
+    <intro jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;We'd Love to Hear From You&lt;/h2&gt;&lt;p&gt;Have questions about the Vue 3 Page Renderer or Peregrine CMS in general? Whether you're looking for technical support, want to contribute, or just want to say hello, we're here to help.&lt;/p&gt;"/>
+
+    <links jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/structure/container"
+      extraclasses="per-grid">
+
+      <github jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;🐙 GitHub&lt;/h4&gt;&lt;p&gt;Browse the source code, report issues, or submit pull requests on our GitHub repository.&lt;/p&gt;"/>
+
+      <docs jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;📖 Documentation&lt;/h4&gt;&lt;p&gt;Visit our comprehensive documentation site for guides and API references.&lt;/p&gt;"/>
+
+      <community jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;💬 Community&lt;/h4&gt;&lt;p&gt;Join the discussion on our community forums or chat with us on Slack.&lt;/p&gt;"/>
+
+    </links>
+
+    <nested jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;Nested Container Test&lt;/h2&gt;&lt;p&gt;The following section demonstrates a nested container to verify recursive rendering works correctly.&lt;/p&gt;"/>
+
+    <nestedcontainer jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/structure/container"
+      extraclasses="per-container--styled">
+
+      <nestedtext jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-card"
+        text="&lt;h3&gt;Inside Nested Container&lt;/h3&gt;&lt;p&gt;This content is rendered inside a nested container. The Vue 3 renderer correctly handles recursive component structures.&lt;/p&gt;"/>
+
+    </nestedcontainer>
+
+  </jcr:content>
+
+</jcr:root>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+  xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  jcr:primaryType="per:Page"
+  jcr:title="pagerender-vue3 templates"
+  jcr:description="Pagerender-Vue3 Templates Root">
+
+  <jcr:content
+    jcr:primaryType="per:PageContent"
+    sling:resourceType="pagerendervue3/structure/page"
+    jcr:title="pagerender-vue3 templates"
+    siteCSS="[/etc/felibs/pagerendervue3/css/components.css]"
+    siteJS="[/etc/felibs/pagerendervue3/vue/vue.global.js]"/>
+
+</jcr:root>

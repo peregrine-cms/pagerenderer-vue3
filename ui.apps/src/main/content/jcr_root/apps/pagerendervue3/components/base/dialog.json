@@ -1,0 +1,16 @@
+{ "fields":[
+  {
+    "type": "texteditor",
+    "label": "Text",
+    "model": "text",
+    "rows": 10,
+    "placeholder": "Enter text content"
+  },
+  {
+    "type": "input",
+    "inputType": "text",
+    "label": "Extra Classes",
+    "model": "extraclasses",
+    "placeholder": "e.g. per-hero, per-card, per-feature-card"
+  }
+]}

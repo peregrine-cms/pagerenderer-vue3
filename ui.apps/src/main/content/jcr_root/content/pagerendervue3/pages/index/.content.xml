@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+  xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+  jcr:primaryType="per:Page">
+
+  <jcr:content
+    jcr:primaryType="per:PageContent"
+    sling:resourceType="pagerendervue3/structure/page"
+    jcr:title="Vue 3 Home"
+    brand="Peregrine CMS">
+
+    <hero jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-hero"
+      text="&lt;h1&gt;🚀 Vue 3 Page Renderer&lt;/h1&gt;&lt;p&gt;A modern, ES Module-based page renderer for Peregrine CMS built with Vue 3 Composition API&lt;/p&gt;"/>
+
+    <nav jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-nav"
+      text="&lt;a href='/content/pagerendervue3/pages/index.html' class='active'&gt;Home&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/about.html'&gt;About&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/features.html'&gt;Features&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/contact.html'&gt;Contact&lt;/a&gt;"/>
+
+    <intro jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;Welcome&lt;/h2&gt;&lt;p&gt;This is a sample site demonstrating the Vue 3 page renderer for Peregrine CMS. The renderer leverages modern JavaScript features including:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Vue 3 Composition API&lt;/strong&gt; with &lt;code&gt;setup()&lt;/code&gt;, &lt;code&gt;ref()&lt;/code&gt;, and &lt;code&gt;computed()&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Proxy-based reactivity&lt;/strong&gt; for efficient change detection&lt;/li&gt;&lt;li&gt;&lt;strong&gt;ES Modules&lt;/strong&gt; for clean code organization&lt;/li&gt;&lt;li&gt;&lt;strong&gt;SPA navigation&lt;/strong&gt; with history management&lt;/li&gt;&lt;/ul&gt;"/>
+
+    <features jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/structure/container"
+      extraclasses="per-grid">
+
+      <card1 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;Composition API&lt;/h4&gt;&lt;p&gt;Modern reactive programming with ref, reactive, computed, and inject patterns&lt;/p&gt;"/>
+
+      <card2 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;ES Modules&lt;/h4&gt;&lt;p&gt;Clean module structure with proper imports and exports for tree-shaking&lt;/p&gt;"/>
+
+      <card3 jcr:primaryType="nt:unstructured"
+        sling:resourceType="pagerendervue3/components/base"
+        extraclasses="per-feature-card"
+        text="&lt;h4&gt;SPA Navigation&lt;/h4&gt;&lt;p&gt;Smooth client-side page transitions with browser history support&lt;/p&gt;"/>
+
+    </features>
+
+    <cta jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h3&gt;Get Started&lt;/h3&gt;&lt;p&gt;Explore the &lt;a href='/content/pagerendervue3/pages/features.html'&gt;Features&lt;/a&gt; page to learn more about the renderer's capabilities, or check out the &lt;a href='/content/pagerendervue3/pages/about.html'&gt;About&lt;/a&gt; page for technical details.&lt;/p&gt;"/>
+
+  </jcr:content>
+
+</jcr:root>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root
+  xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+  xmlns:jcr="http://www.jcp.org/jcr/1.0"
+  xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+  jcr:primaryType="per:Page">
+
+  <jcr:content
+    jcr:primaryType="per:PageContent"
+    sling:resourceType="pagerendervue3/structure/page"
+    jcr:title="About"
+    brand="Peregrine CMS">
+
+    <hero jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-hero"
+      text="&lt;h1&gt;About the Renderer&lt;/h1&gt;&lt;p&gt;Technical details and architecture of the Vue 3 page renderer&lt;/p&gt;"/>
+
+    <nav jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-nav"
+      text="&lt;a href='/content/pagerendervue3/pages/index.html'&gt;Home&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/about.html' class='active'&gt;About&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/features.html'&gt;Features&lt;/a&gt; &lt;a href='/content/pagerendervue3/pages/contact.html'&gt;Contact&lt;/a&gt;"/>
+
+    <intro jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;What is the Vue 3 Page Renderer?&lt;/h2&gt;&lt;p&gt;The Vue 3 Page Renderer is a modern replacement for the legacy Vue 2 renderer in Peregrine CMS. It provides the same core functionality—rendering JCR content as interactive Vue components—but built on Vue 3's improved architecture.&lt;/p&gt;&lt;p&gt;The renderer handles component registration, SPA navigation, edit mode detection, and seamless integration with Peregrine's admin console.&lt;/p&gt;"/>
+
+    <architecture jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;Architecture&lt;/h2&gt;&lt;h3&gt;Core Components&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;peregrineApp.js&lt;/strong&gt; — Main runtime handling app creation, navigation, and state management&lt;/li&gt;&lt;li&gt;&lt;strong&gt;PageModel.java&lt;/strong&gt; — Sling Model for page-level properties and CSS/JS inheritance&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Container.java&lt;/strong&gt; — Sling Model for components with children&lt;/li&gt;&lt;li&gt;&lt;strong&gt;BaseComponentModel.java&lt;/strong&gt; — Base Sling Model exporting text properties&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Key Patterns&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Composition API&lt;/strong&gt; — Components use &lt;code&gt;setup()&lt;/code&gt;, &lt;code&gt;inject()&lt;/code&gt;, and &lt;code&gt;computed()&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Dependency Injection&lt;/strong&gt; — Context provided via &lt;code&gt;inject('peregrineApp')&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Reactive State&lt;/strong&gt; — Page state managed with Vue's &lt;code&gt;reactive()&lt;/code&gt;&lt;/li&gt;&lt;/ul&gt;"/>
+
+    <comparison jcr:primaryType="nt:unstructured"
+      sling:resourceType="pagerendervue3/components/base"
+      extraclasses="per-card"
+      text="&lt;h2&gt;Vue 2 vs Vue 3 Comparison&lt;/h2&gt;&lt;p&gt;Key differences from the Vue 2 renderer:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;strong&gt;API Style&lt;/strong&gt; — Options API → Composition API&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Reactivity&lt;/strong&gt; — Object.defineProperty → Proxy-based&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Context&lt;/strong&gt; — &lt;code&gt;this.$root&lt;/code&gt; → &lt;code&gt;inject()&lt;/code&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Module Format&lt;/strong&gt; — Mixed IIFE → ES Modules&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Build Tools&lt;/strong&gt; — Rollup + Buble → Rollup + esbuild&lt;/li&gt;&lt;/ul&gt;"/>
+
+  </jcr:content>
+
+</jcr:root>

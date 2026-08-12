@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue 3 Page Renderer Demo</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .demo-header h1 { margin: 0 0 10px 0; }
+        .demo-header p { margin: 0; opacity: 0.9; }
+        .demo-controls {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .demo-controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .demo-controls button.primary {
+            background: #667eea;
+            color: white;
+        }
+        .demo-controls button.primary:hover {
+            background: #5a6fd6;
+        }
+        .demo-controls button.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        .demo-controls button.secondary:hover {
+            background: #d0d0d0;
+        }
+        .demo-controls .status {
+            margin-left: auto;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .demo-controls .status.loaded { background: #d4edda; color: #155724; }
+        .demo-controls .status.loading { background: #fff3cd; color: #856404; }
+        .demo-controls .status.error { background: #f8d7da; color: #721c24; }
+        .demo-controls .current-page {
+            font-size: 12px;
+            color: #666;
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        #peregrine-app {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 400px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .per-loading { 
+            text-align: center; 
+            padding: 60px; 
+            color: #666; 
+        }
+        .per-error {
+            text-align: center;
+            padding: 40px;
+            color: #dc3545;
+            background: #f8d7da;
+            border-radius: 8px;
+        }
+        .per-page {
+            min-height: 200px;
+        }
+        .component-card {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .component-card h3 { 
+            margin: 0 0 10px 0; 
+            color: #667eea; 
+            font-size: 18px;
+        }
+        .per-container {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        }
+        .per-drop-target {
+            border: 1px dashed #c0c0c0;
+            padding: 8px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+        .per-drop-target:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .feature-card h4 { margin: 0 0 8px 0; }
+        .feature-card p { margin: 0; font-size: 14px; opacity: 0.9; }
+        
+        /* Navigation links */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .nav-links a.active {
+            color: #333;
+            cursor: default;
+        }
+        .nav-links a.active:hover {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🚀 Peregrine Vue 3 Page Renderer</h1>
+        <p>Modern ES Module implementation with Composition API</p>
+    </div>
+
+    <div class="demo-controls">
+        <button class="primary" onclick="loadPage('home')">Load Home</button>
+        <button class="secondary" onclick="loadPage('about')">Load About</button>
+        <button class="secondary" onclick="loadPage('features')">Load Features</button>
+        <button class="secondary" onclick="toggleEditMode()">Toggle Edit Mode</button>
+        <button class="secondary" onclick="testHelpers()">Test Helpers</button>
+        <span class="current-page" id="currentPage">Page: home</span>
+        <span class="status loaded" id="statusBadge">Ready</span>
+    </div>
+
+    <div id="peregrine-app">
+        <div class="per-loading">Initializing Vue 3 App...</div>
+    </div>
+
+    <!-- Vue 3 from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+    <script>
+        // =================================================================
+        // Inline peregrineApp for demo (normally loaded from separate file)
+        // =================================================================
+        
+        const { createApp, reactive, computed, inject, onMounted, ref } = Vue;
+
+        // Helper utilities
+        const helpers = {
+            isEmpty(field) {
+                if (field === undefined || field === null || field === '') return true;
+                if (field === '<p><br></p>' || field === '<p></p>') return true;
+                if (Array.isArray(field) && field.length === 0) return true;
+                return false;
+            },
+            areAllEmpty(...fields) {
+                return fields.every(field => helpers.isEmpty(field));
+            },
+            pathToUrl(path) {
+                if (!path || path.length < 1) return path;
+                if (path.startsWith('#')) return path;
+                const absoluteUrl = /^(?:[a-z]+:)?\/\//i;
+                if (absoluteUrl.test(path)) return path;
+                const hasExtension = /\.\w+$/.test(path);
+                if (hasExtension) return path;
+                return `${path}.html`;
+            }
+        };
+
+        // Page state
+        const pageState = reactive({
+            page: null,
+            path: null,
+            status: 'initial',
+            error: null
+        });
+
+        // Current page name (for demo navigation)
+        let currentPageName = 'home';
+
+        // Edit mode simulation
+        let simulateEditMode = true;
+
+        // Component registry
+        const registeredComponents = new Map();
+        let vueApp = null;
+        let appMounted = false;
+
+        function resourceTypeToComponentName(rt) {
+            if (!rt) return null;
+            return rt.replace(/\//g, '-').toLowerCase();
+        }
+
+        function componentNameToVarName(name) {
+            const segments = name.split('-');
+            return 'cmp' + segments.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+        }
+
+        function loadComponent(name) {
+            const normalized = name.includes('/') ? resourceTypeToComponentName(name) : name.toLowerCase();
+            if (registeredComponents.has(normalized)) return true;
+            
+            const varName = componentNameToVarName(normalized);
+            const component = window[varName];
+            
+            if (component) {
+                if (vueApp) vueApp.component(normalized, component);
+                registeredComponents.set(normalized, component);
+                console.log('[Demo] Registered:', normalized);
+                return true;
+            }
+            console.warn('[Demo] Component not found:', normalized);
+            return false;
+        }
+
+        function walkTreeAndLoadComponents(node) {
+            if (!node) return;
+            if (node.component) loadComponent(node.component);
+            if (node.children) node.children.forEach(walkTreeAndLoadComponents);
+        }
+
+        // =================================================================
+        // Mock Page Data
+        // =================================================================
+
+        const mockPages = {
+            home: {
+                path: "/content/demo/pages/home/jcr:content",
+                component: "pagerendervue3/structure/page",
+                title: "Demo Home Page",
+                brand: "Vue 3 Renderer",
+                description: "A demonstration of the Vue 3 page renderer",
+                children: [
+                    {
+                        path: "/content/demo/pages/home/jcr:content/richtext1",
+                        component: "demo/components/richtext",
+                        text: "<h2>Welcome to Vue 3 Page Renderer</h2><p>This demonstrates the modernized Vue 3 based page renderer for Peregrine CMS with full ES Module support, Composition API, and SPA navigation.</p>"
+                    },
+                    {
+                        path: "/content/demo/pages/home/jcr:content/nav",
+                        component: "demo/components/navigation",
+                        currentPage: "home"
+                    },
+                    {
+                        path: "/content/demo/pages/home/jcr:content/container1",
+                        component: "pagerendervue3/structure/container",
+                        children: [
+                            { 
+                                path: "/content/demo/jcr:content/container1/card1", 
+                                component: "demo/components/featurecard", 
+                                title: "Composition API", 
+                                text: "Uses ref, reactive, computed, and inject for modern reactive patterns" 
+                            },
+                            { 
+                                path: "/content/demo/jcr:content/container1/card2", 
+                                component: "demo/components/featurecard", 
+                                title: "ES Modules", 
+                                text: "Clean module structure with proper imports/exports" 
+                            },
+                            { 
+                                path: "/content/demo/jcr:content/container1/card3", 
+                                component: "demo/components/featurecard", 
+                                title: "SPA Navigation", 
+                                text: "Smooth client-side transitions with history support" 
+                            }
+                        ]
+                    },
+                    {
+                        path: "/content/demo/pages/home/jcr:content/richtext2",
+                        component: "demo/components/richtext",
+                        text: "<h3>Helper Utilities</h3><p>The <code>$helper</code> object provides useful functions like <code>isEmpty()</code>, <code>areAllEmpty()</code>, and <code>pathToUrl()</code> for component development.</p>"
+                    }
+                ]
+            },
+
+            about: {
+                path: "/content/demo/pages/about/jcr:content",
+                component: "pagerendervue3/structure/page",
+                title: "About Page",
+                brand: "Vue 3 Renderer",
+                children: [
+                    {
+                        path: "/content/demo/pages/about/jcr:content/richtext1",
+                        component: "demo/components/richtext",
+                        text: "<h2>About This Renderer</h2><p>The Vue 3 Page Renderer is a modern replacement for the Vue 2 renderer in Peregrine CMS. It leverages the Composition API for better code organization and reusability.</p>"
+                    },
+                    {
+                        path: "/content/demo/pages/about/jcr:content/nav",
+                        component: "demo/components/navigation",
+                        currentPage: "about"
+                    },
+                    {
+                        path: "/content/demo/pages/about/jcr:content/richtext2",
+                        component: "demo/components/richtext",
+                        text: "<h3>Key Improvements</h3><ul><li><strong>Vue 3 Composition API</strong> - Better logic reuse and organization</li><li><strong>Proxy-based reactivity</strong> - More efficient change detection</li><li><strong>ES Module architecture</strong> - Tree-shakeable, modern bundling</li><li><strong>Better TypeScript support</strong> - First-class type inference</li><li><strong>Smaller bundle size</strong> - Vue 3 is lighter than Vue 2</li></ul>"
+                    }
+                ]
+            },
+
+            features: {
+                path: "/content/demo/pages/features/jcr:content",
+                component: "pagerendervue3/structure/page",
+                title: "Features Page",
+                brand: "Vue 3 Renderer",
+                children: [
+                    {
+                        path: "/content/demo/pages/features/jcr:content/richtext1",
+                        component: "demo/components/richtext",
+                        text: "<h2>Renderer Features</h2><p>Explore the capabilities of the Vue 3 page renderer.</p>"
+                    },
+                    {
+                        path: "/content/demo/pages/features/jcr:content/nav",
+                        component: "demo/components/navigation",
+                        currentPage: "features"
+                    },
+                    {
+                        path: "/content/demo/pages/features/jcr:content/container1",
+                        component: "pagerendervue3/structure/container",
+                        children: [
+                            { 
+                                path: "/content/demo/jcr:content/container1/card1", 
+                                component: "demo/components/featurecard", 
+                                title: "Edit Mode Detection", 
+                                text: "Components can detect author mode via inject('peregrineApp')" 
+                            },
+                            { 
+                                path: "/content/demo/jcr:content/container1/card2", 
+                                component: "demo/components/featurecard", 
+                                title: "Placeholder System", 
+                                text: "Drop targets appear automatically in edit mode" 
+                            },
+                            { 
+                                path: "/content/demo/jcr:content/container1/card3", 
+                                component: "demo/components/featurecard", 
+                                title: "Inline Editing", 
+                                text: "data-per-inline attribute enables in-place editing" 
+                            },
+                            { 
+                                path: "/content/demo/jcr:content/container1/card4", 
+                                component: "demo/components/featurecard", 
+                                title: "Component Lazy Loading", 
+                                text: "Components are registered on-demand as content loads" 
+                            }
+                        ]
+                    },
+                    {
+                        path: "/content/demo/pages/features/jcr:content/richtext2",
+                        component: "demo/components/richtext",
+                        text: "<h3>Try It Out</h3><p>Click <strong>Toggle Edit Mode</strong> above to see the placeholders appear and disappear. This simulates how the renderer behaves inside the Peregrine admin console.</p>"
+                    }
+                ]
+            }
+        };
+
+        // =================================================================
+        // Public API
+        // =================================================================
+
+        const peregrineApp = {
+            version: '3.0.0',
+            isAuthorMode: () => simulateEditMode,
+            getPageState: () => pageState,
+            loadComponent,
+            helpers,
+            getView: () => pageState,
+            
+            // Load a page by name (for demo)
+            loadPage(pageName) {
+                console.log('[Demo] loadPage:', pageName);
+                updateStatus('loading');
+                
+                const pageData = mockPages[pageName];
+                if (!pageData) {
+                    console.error('[Demo] Page not found:', pageName);
+                    pageState.status = 'error';
+                    pageState.error = `Page "${pageName}" not found`;
+                    updateStatus('error');
+                    return;
+                }
+
+                // Simulate network delay
+                setTimeout(() => {
+                    currentPageName = pageName;
+                    pageState.page = pageData;
+                    pageState.path = pageData.path;
+                    pageState.status = 'loaded';
+                    walkTreeAndLoadComponents(pageData);
+                    updateStatus('loaded');
+                    updateCurrentPageDisplay(pageName);
+                    
+                    // Dispatch event like the real renderer does
+                    window.dispatchEvent(new CustomEvent('pageRendered', { 
+                        detail: { path: pageData.path, page: pageData } 
+                    }));
+                    
+                    console.log('[Demo] Page loaded:', pageName);
+                }, 200);
+            },
+
+            // For compatibility with real API
+            loadContent(path, firstTime = false, fromPopState = false) {
+                // Extract page name from path
+                const match = path.match(/\/([^\/]+)\.html$/);
+                const pageName = match ? match[1] : 'home';
+                this.loadPage(pageName);
+            },
+
+            loadContentFrom(elementId, path, firstTime = false) {
+                this.loadPage('home');
+            }
+        };
+
+        window.$peregrineApp = peregrineApp;
+
+        // =================================================================
+        // Define Demo Components
+        // =================================================================
+
+        // Page component
+        window.cmpPagerendervue3StructurePage = {
+            props: ['model'],
+            setup(props) {
+                const app = inject('peregrineApp');
+                const isEditMode = computed(() => app?.isAuthorMode?.() ?? false);
+                const isEmpty = computed(() => !props.model.children?.length);
+                const getComponentName = (rt) => rt ? rt.replace(/\//g, '-').toLowerCase() : 'div';
+                return { isEditMode, isEmpty, getComponentName };
+            },
+            template: `
+                <div class="per-page" :data-per-path="model.path">
+                    <pagerendervue3-components-placeholder 
+                        v-if="isEditMode && isEmpty"
+                        :model="{ path: model.path, component: 'Drop components here', location: 'into' }"
+                    />
+                    <template v-for="child in model.children" :key="child.path">
+                        <component :is="getComponentName(child.component)" :model="child" />
+                    </template>
+                </div>
+            `
+        };
+
+        // Container component
+        window.cmpPagerendervue3StructureContainer = {
+            props: ['model'],
+            setup(props) {
+                const app = inject('peregrineApp');
+                const isEditMode = computed(() => app?.isAuthorMode?.() ?? false);
+                const hasChildren = computed(() => props.model.children?.length > 0);
+                const getComponentName = (rt) => rt ? rt.replace(/\//g, '-').toLowerCase() : 'div';
+                return { isEditMode, hasChildren, getComponentName };
+            },
+            template: `
+                <div class="per-container" :data-per-path="model.path">
+                    <pagerendervue3-components-placeholder 
+                        v-if="isEditMode && hasChildren"
+                        :model="{ path: model.path, component: 'container', location: 'before' }"
+                    />
+                    <pagerendervue3-components-placeholder 
+                        v-if="isEditMode && !hasChildren"
+                        :model="{ path: model.path, component: 'Drop components here', location: 'into' }"
+                    />
+                    <div class="cards-grid">
+                        <template v-for="child in model.children" :key="child.path">
+                            <component :is="getComponentName(child.component)" :model="child" />
+                        </template>
+                    </div>
+                    <pagerendervue3-components-placeholder 
+                        v-if="isEditMode && hasChildren"
+                        :model="{ path: model.path, component: 'container', location: 'after' }"
+                    />
+                </div>
+            `
+        };
+
+        // Placeholder component
+        window.cmpPagerendervue3ComponentsPlaceholder = {
+            props: ['model'],
+            setup(props) {
+                const app = inject('peregrineApp');
+                const isVisible = computed(() => app?.isAuthorMode?.() ?? false);
+                const label = computed(() => {
+                    const base = props.model.component || 'component';
+                    const loc = props.model.location;
+                    if (loc === 'before') return base + ' start';
+                    if (loc === 'after') return base + ' end';
+                    return base;
+                });
+                return { isVisible, label };
+            },
+            template: `
+                <div v-if="isVisible" class="per-drop-target" 
+                     :data-per-path="model.path"
+                     data-per-droptarget="true"
+                     :data-per-location="model.location">
+                    {{ label }}
+                </div>
+            `
+        };
+
+        // Base component
+        window.cmpPagerendervue3ComponentsBase = {
+            props: ['model'],
+            setup(props) {
+                const app = inject('peregrineApp');
+                const isEditMode = computed(() => app?.isAuthorMode?.() ?? false);
+                const hasContent = computed(() => props.model.text?.trim());
+                return { isEditMode, hasContent };
+            },
+            template: `
+                <div class="component-card" :data-per-path="model.path">
+                    <div v-if="hasContent" v-html="model.text" :data-per-inline="'model.text'" />
+                    <div v-else-if="isEditMode" style="color: #999; font-style: italic;">No content</div>
+                </div>
+            `
+        };
+
+        // Demo: Rich text component
+        window.cmpDemoComponentsRichtext = {
+            props: ['model'],
+            template: `
+                <div class="component-card" :data-per-path="model.path">
+                    <div v-html="model.text" :data-per-inline="'model.text'" />
+                </div>
+            `
+        };
+
+        // Demo: Navigation component
+        window.cmpDemoComponentsNavigation = {
+            props: ['model'],
+            setup(props) {
+                const pages = [
+                    { name: 'home', title: 'Home' },
+                    { name: 'about', title: 'About' },
+                    { name: 'features', title: 'Features' }
+                ];
+                
+                const handleClick = (e, pageName) => {
+                    e.preventDefault();
+                    if (pageName === props.model.currentPage) return;
+                    $peregrineApp.loadPage(pageName);
+                };
+                
+                return { pages, handleClick };
+            },
+            template: `
+                <div class="nav-links">
+                    <a v-for="page in pages" 
+                       :key="page.name"
+                       href="#"
+                       :class="{ active: page.name === model.currentPage }"
+                       @click="handleClick($event, page.name)">
+                        {{ page.title }}
+                    </a>
+                </div>
+            `
+        };
+
+        // Demo: Feature card component
+        window.cmpDemoComponentsFeaturecard = {
+            props: ['model'],
+            template: `
+                <div class="feature-card" :data-per-path="model.path">
+                    <h4>{{ model.title }}</h4>
+                    <p>{{ model.text }}</p>
+                </div>
+            `
+        };
+
+        // =================================================================
+        // Initialize Vue App
+        // =================================================================
+
+        function initVueApp() {
+            if (vueApp && appMounted) return;
+            
+            console.log('[Demo] Creating Vue app...');
+
+            vueApp = createApp({
+                setup() {
+                    const getComponentName = (rt) => rt ? rt.replace(/\//g, '-').toLowerCase() : 'div';
+                    return {
+                        page: computed(() => pageState.page),
+                        pageComponentName: computed(() => {
+                            if (!pageState.page?.component) return 'pagerendervue3-structure-page';
+                            return getComponentName(pageState.page.component);
+                        }),
+                        status: computed(() => pageState.status),
+                        error: computed(() => pageState.error)
+                    };
+                },
+                template: `
+                    <template v-if="status === 'loaded' && page">
+                        <component :is="pageComponentName" :model="page" />
+                    </template>
+                    <template v-else-if="status === 'loading'">
+                        <div class="per-loading">Loading...</div>
+                    </template>
+                    <template v-else-if="status === 'error'">
+                        <div class="per-error">Error: {{ error }}</div>
+                    </template>
+                    <template v-else>
+                        <div class="per-loading">Initializing...</div>
+                    </template>
+                `
+            });
+
+            // Provide context
+            vueApp.provide('peregrineApp', peregrineApp);
+            vueApp.config.globalProperties.$helper = helpers;
+
+            // Register components
+            loadComponent('pagerendervue3-structure-page');
+            loadComponent('pagerendervue3-structure-container');
+            loadComponent('pagerendervue3-components-placeholder');
+            loadComponent('pagerendervue3-components-base');
+            loadComponent('demo-components-richtext');
+            loadComponent('demo-components-navigation');
+            loadComponent('demo-components-featurecard');
+
+            vueApp.mount('#peregrine-app');
+            appMounted = true;
+            console.log('[Demo] Vue app mounted');
+        }
+
+        // =================================================================
+        // Demo Controls
+        // =================================================================
+
+        function updateStatus(status) {
+            const badge = document.getElementById('statusBadge');
+            badge.className = 'status ' + status;
+            badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        function updateCurrentPageDisplay(pageName) {
+            document.getElementById('currentPage').textContent = 'Page: ' + pageName;
+        }
+
+        function loadPage(pageName) {
+            $peregrineApp.loadPage(pageName);
+        }
+
+        function toggleEditMode() {
+            simulateEditMode = !simulateEditMode;
+            console.log('[Demo] Edit mode:', simulateEditMode ? 'ON' : 'OFF');
+            
+            // Force re-render by toggling page
+            const currentPage = pageState.page;
+            pageState.page = null;
+            requestAnimationFrame(() => {
+                pageState.page = currentPage;
+            });
+        }
+
+        function testHelpers() {
+            console.log('=== Testing Helpers ===');
+            console.log('isEmpty(""):', helpers.isEmpty(''));
+            console.log('isEmpty("hello"):', helpers.isEmpty('hello'));
+            console.log('isEmpty("<p><br></p>"):', helpers.isEmpty('<p><br></p>'));
+            console.log('isEmpty([]):', helpers.isEmpty([]));
+            console.log('isEmpty(["item"]):', helpers.isEmpty(['item']));
+            console.log('areAllEmpty("", null):', helpers.areAllEmpty('', null));
+            console.log('areAllEmpty("", "text"):', helpers.areAllEmpty('', 'text'));
+            console.log('pathToUrl("/content/page"):', helpers.pathToUrl('/content/page'));
+            console.log('pathToUrl("/content/page.html"):', helpers.pathToUrl('/content/page.html'));
+            console.log('pathToUrl("#anchor"):', helpers.pathToUrl('#anchor'));
+            console.log('pathToUrl("https://example.com"):', helpers.pathToUrl('https://example.com'));
+            alert('Check browser console for helper test results');
+        }
+
+        // =================================================================
+        // Bootstrap
+        // =================================================================
+
+        // Initialize Vue app first
+        initVueApp();
+        
+        // Then load initial page
+        $peregrineApp.loadPage('home');
+
+        console.log('[Demo] Vue 3 Page Renderer Demo initialized');
+        console.log('[Demo] peregrineApp version:', $peregrineApp.version);
+    </script>
+</body>
+</html>
