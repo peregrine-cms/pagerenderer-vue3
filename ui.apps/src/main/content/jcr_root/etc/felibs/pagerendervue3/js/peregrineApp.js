@@ -675,12 +675,165 @@ function isUsingParentView() {
   return false;
 }
 
+// =============================================================================
+// Renderer Protocol (postMessage) - editor communication
+// =============================================================================
+//
+// The renderer announces itself with 'renderer:ready'. An editor that speaks
+// the protocol replies 'admin:ready' and from then on pushes model changes as
+// explicit messages (component:update / page:update). On upgrade we detach
+// from the editor's shared Vue 2 object into a local deep clone, so Vue 3's
+// proxy reactivity handles updates naturally - no cross-runtime hacks.
+//
+// If no 'admin:ready' arrives (old editor), the legacy Vue 2 $watch bridge
+// below is installed as a fallback after a short grace period.
+
+const PROTOCOL_VERSION = '1.0';
+
+const RENDERER_CAPABILITIES = {
+  serverRefresh: false,
+  reactiveUpdate: true,
+  inlineEdit: true,
+  dragDrop: true
+};
+
+let protocolActive = false;
+let protocolDetached = false;
+let protocolReAnnounced = false;
+
+function announceRenderer(editor) {
+  editor.postMessage({
+    type: 'renderer:ready',
+    protocolVersion: PROTOCOL_VERSION,
+    capabilities: RENDERER_CAPABILITIES,
+    framework: 'vue3'
+  }, window.location.origin);
+  log.info('renderer:ready sent to editor');
+}
+
+function isInEditorFrame() {
+  try {
+    return window.parent && window.parent !== window
+        && !!(window.frameElement && window.frameElement.attributes['data-per-mode']);
+  } catch (e) {
+    return false;
+  }
+}
+
+function findNodeByPath(node, path) {
+  if (!node) return null;
+  if (node.path === path) return node;
+  if (Array.isArray(node.children)) {
+    for (const child of node.children) {
+      const found = findNodeByPath(child, path);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+/**
+ * Detach the mounted app from the editor's shared page object into a local
+ * deep clone. From here on the model is updated exclusively via protocol
+ * messages, which is what makes Vue 3 (and cross-origin setups) viable.
+ */
+function detachToLocalState() {
+  if (protocolDetached) return;
+  if (!vueAppInstance || !vueAppInstance.page) return;
+  vueAppInstance.page = JSON.parse(JSON.stringify(vueAppInstance.page));
+  protocolDetached = true;
+  log.info('Detached page model to local reactive state (protocol mode)');
+}
+
+function applyComponentUpdate(path, data) {
+  if (!vueAppInstance || !vueAppInstance.page) return;
+  // Structural replace: clone the page, mutate the target node in the clone,
+  // then reassign vueAppInstance.page. This is the same reassignment pattern
+  // loadContent() uses for SPA navigation and it re-renders reliably - in-place
+  // mutation of a deeply nested reactive node proved flaky for repeated edits.
+  const nextPage = JSON.parse(JSON.stringify(vueAppInstance.page));
+  const node = findNodeByPath(nextPage, path);
+  if (node) {
+    Object.keys(data).forEach((key) => {
+      // don't let a component payload clobber the children subtree
+      if (key === 'children') return;
+      node[key] = data[key];
+    });
+    vueAppInstance.page = nextPage;
+    log.debug('component:update applied at', path);
+  } else {
+    log.warn('component:update: no node found at', path);
+  }
+}
+
+function initEditProtocol() {
+  if (!isInEditorFrame()) return;
+
+  const editor = window.parent;
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== editor) return;
+    if (event.origin !== window.location.origin) return;
+    const msg = event.data;
+    if (!msg || typeof msg.type !== 'string') return;
+
+    switch (msg.type) {
+      case 'admin:ready':
+        protocolActive = true;
+        log.info('Editor speaks renderer protocol, capabilities:',
+            JSON.stringify(msg.capabilities || {}));
+        detachToLocalState();
+        // this may be the editor's attach-time probe (our initial
+        // renderer:ready can fire before the editor listens); re-announce
+        // once so the editor upgrades its transport
+        if (!protocolReAnnounced) {
+          protocolReAnnounced = true;
+          announceRenderer(editor);
+        }
+        break;
+      case 'component:update':
+        if (msg.path && msg.data) applyComponentUpdate(msg.path, msg.data);
+        break;
+      case 'page:update':
+        if (msg.page && vueAppInstance) {
+          vueAppInstance.page = msg.page;
+          log.debug('page:update applied');
+        } else if (vueAppInstance) {
+          vueAppInstance.$forceUpdate();
+        }
+        break;
+      case 'page:load':
+        // full model arrives via page:update in the same editor flow
+        log.debug('page:load', msg.path);
+        break;
+      case 'page:reload':
+      case 'mode:change':
+        window.location.reload();
+        break;
+      case 'inline:edit-start':
+      case 'inline:edit-end':
+        // inline editing mechanics are editor driven (direct DOM); these
+        // are coordination signals only
+        log.debug(msg.type, msg.path, msg.field);
+        break;
+      default:
+        // unknown message types are ignored per spec
+        break;
+    }
+  });
+
+  announceRenderer(editor);
+}
+
 /**
  * Set up a bridge to sync changes between Vue 2 (parent) and Vue 3 (iframe).
- * 
+ *
+ * LEGACY FALLBACK - only used when the editor does not speak the renderer
+ * protocol (no admin:ready received).
+ *
  * The problem: Vue 2's reactivity uses getters/setters, Vue 3 uses Proxies.
  * When Vue 2 modifies the shared object, Vue 3's proxy doesn't detect it.
- * 
+ *
  * Solution: We use Vue 2's $watch in the parent to detect changes, then
  * trigger Vue 3's reactivity by calling $forceUpdate.
  */
@@ -798,9 +951,17 @@ function initVueApp() {
     appMounted = true;
     log.info('Vue app mounted');
     
-    // Set up the Vue 2 <-> Vue 3 bridge for edit mode
+    // Editor integration: announce the renderer protocol; if the editor
+    // does not answer with admin:ready, fall back to the legacy Vue 2
+    // $watch bridge after a grace period.
     if (inEditMode) {
-      setupParentViewBridge(vueApp);
+      initEditProtocol();
+      setTimeout(() => {
+        if (!protocolActive) {
+          log.info('No admin:ready received - using legacy parent view bridge');
+          setupParentViewBridge(vueApp);
+        }
+      }, 1000);
     }
   } else {
     log.error('Mount element #peregrine-app not found');
