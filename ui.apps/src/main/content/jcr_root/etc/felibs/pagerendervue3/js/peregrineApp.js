@@ -795,7 +795,10 @@ function initEditProtocol() {
         if (msg.path && msg.data) applyComponentUpdate(msg.path, msg.data);
         break;
       case 'page:update':
-        if (msg.page && vueAppInstance) {
+        // guard against a non-object page: the app data is bound to the
+        // parent's shared pageView, so assigning a bad value would echo back
+        // into the editor's model
+        if (msg.page && typeof msg.page === 'object' && vueAppInstance) {
           vueAppInstance.page = msg.page;
           log.debug('page:update applied');
         } else if (vueAppInstance) {
