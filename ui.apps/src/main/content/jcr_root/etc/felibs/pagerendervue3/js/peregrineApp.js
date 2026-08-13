@@ -712,9 +712,15 @@ function announceRenderer(editor) {
 }
 
 function isInEditorFrame() {
+  // NOTE: do not require the editor's data-per-mode attribute here. The editor
+  // binds it to reactive workspace state (:data-per-mode="previewMode") which
+  // is undefined on a fresh session, so the attribute can appear only AFTER
+  // this frame has booted. Gating the protocol listener on it caused the
+  // handshake to silently fail (transport stuck on legacy: drops persisted
+  // server-side but never reflected live). Being framed on the same origin is
+  // enough - the listener only ever acts on same-origin admin:ready messages.
   try {
-    return window.parent && window.parent !== window
-        && !!(window.frameElement && window.frameElement.attributes['data-per-mode']);
+    return window.parent && window.parent !== window;
   } catch (e) {
     return false;
   }
@@ -755,8 +761,11 @@ function applyComponentUpdate(path, data) {
   const node = findNodeByPath(nextPage, path);
   if (node) {
     Object.keys(data).forEach((key) => {
-      // don't let a component payload clobber the children subtree
-      if (key === 'children') return;
+      // apply children only when the payload actually carries the subtree:
+      // structural changes (drag-drop add/move/delete on a container) arrive
+      // as a children update and MUST re-render, while partial payloads
+      // without children must not clobber the existing subtree
+      if (key === 'children' && !Array.isArray(data.children)) return;
       node[key] = data[key];
     });
     vueAppInstance.page = nextPage;
@@ -954,11 +963,14 @@ function initVueApp() {
     appMounted = true;
     log.info('Vue app mounted');
     
-    // Editor integration: announce the renderer protocol; if the editor
-    // does not answer with admin:ready, fall back to the legacy Vue 2
-    // $watch bridge after a grace period.
+    // Editor integration: whenever framed, install the protocol listener and
+    // announce (initEditProtocol no-ops when not framed; messages are
+    // origin-checked). Kept independent of inEditMode so a slow parent-view
+    // bootstrap can never suppress the handshake.
+    initEditProtocol();
+    // If the editor does not answer with admin:ready, fall back to the
+    // legacy Vue 2 $watch bridge after a grace period.
     if (inEditMode) {
-      initEditProtocol();
       setTimeout(() => {
         if (!protocolActive) {
           log.info('No admin:ready received - using legacy parent view bridge');
