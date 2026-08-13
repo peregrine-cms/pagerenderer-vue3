@@ -699,7 +699,6 @@ const RENDERER_CAPABILITIES = {
 
 let protocolActive = false;
 let protocolDetached = false;
-let protocolReAnnounced = false;
 
 function announceRenderer(editor) {
   editor.postMessage({
@@ -768,6 +767,9 @@ function applyComponentUpdate(path, data) {
       if (key === 'children' && !Array.isArray(data.children)) return;
       node[key] = data[key];
     });
+    // a children update can introduce component names this app has not
+    // registered yet (first drop of a component type on the page)
+    walkTreeAndLoadComponents(node);
     vueAppInstance.page = nextPage;
     log.debug('component:update applied at', path);
   } else {
@@ -792,13 +794,14 @@ function initEditProtocol() {
         log.info('Editor speaks renderer protocol, capabilities:',
             JSON.stringify(msg.capabilities || {}));
         detachToLocalState();
-        // this may be the editor's attach-time probe (our initial
-        // renderer:ready can fire before the editor listens); re-announce
-        // once so the editor upgrades its transport
-        if (!protocolReAnnounced) {
-          protocolReAnnounced = true;
-          announceRenderer(editor);
-        }
+        // ALWAYS answer with renderer:ready. The editor's bridge resets to
+        // the legacy transport on every iframe load event and probes with
+        // admin:ready - but our boot announce may already have been consumed
+        // before that reset (scripts run before the load event), so a
+        // once-per-load guard here left the editor stranded on legacy. The
+        // editor ignores renderer:ready when it is already on postMessage,
+        // so answering every probe cannot loop.
+        announceRenderer(editor);
         break;
       case 'component:update':
         if (msg.path && msg.data) applyComponentUpdate(msg.path, msg.data);
@@ -808,6 +811,13 @@ function initEditProtocol() {
         // parent's shared pageView, so assigning a bad value would echo back
         // into the editor's model
         if (msg.page && typeof msg.page === 'object' && vueAppInstance) {
+          // register any components the updated model references that have
+          // not been seen yet (same as loadContent does for SPA navigation).
+          // A freshly dropped component otherwise cannot be resolved by Vue
+          // and silently renders nothing until a full reload re-walks the
+          // model - the transport's loadComponent is intentionally a no-op,
+          // the renderer owns its component registry.
+          walkTreeAndLoadComponents(msg.page);
           vueAppInstance.page = msg.page;
           log.debug('page:update applied');
         } else if (vueAppInstance) {
@@ -898,6 +908,13 @@ function initVueApp() {
   // Get the view - in edit mode this is window.parent.$perAdminView.pageView
   // which is shared with the admin console for two-way binding.
   const view = getView();
+  // Ensure the 'page' key exists BEFORE this object becomes the reactive data
+  // root. On a freshly opened editor the parent may not have populated
+  // pageView.page yet (readNode still in flight); without the key, later
+  // assignments through the instance proxy (page:update, loadContent) land on
+  // the non-reactive ctx and never re-render - the exact "component only
+  // appears after a manual reload" failure.
+  if (view && !('page' in view)) view.page = null;
   const inEditMode = isUsingParentView();
   
   log.debug('Init Vue app, edit mode:', inEditMode);
