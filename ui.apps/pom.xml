@@ -19,6 +19,21 @@
 
     <properties>
         <noContent>false</noContent>
+
+        <!--
+            Fallback for ${nodepath}. In the peregrine-cms reactor that property
+            is set by directory-maven-plugin (highest-basedir), so node and npm
+            are installed once at the top and shared. Building THIS repo on its
+            own, nothing sets it: frontend-maven-plugin then gets the literal
+            string "${nodepath}" as its installDirectory, fails to find the node
+            it installed, and silently falls back to whatever npm/node is on the
+            PATH — which on this machine was old enough that optional chaining
+            in @vitejs/plugin-vue was a SyntaxError.
+
+            A default here keeps the standalone build working; the reactor still
+            overrides it, so nothing changes when built from peregrine-cms.
+        -->
+        <nodepath>${project.basedir}</nodepath>
     </properties>
 
     <build>
@@ -76,6 +91,18 @@
                         <goals>
                             <goal>install-node-and-npm</goal>
                         </goals>
+                        <configuration>
+                            <!--
+                                Pinned here on purpose. The peregrine-cms parent
+                                sets node.version to v12.18.3, which predates
+                                optional chaining — @vitejs/plugin-vue fails to
+                                parse on it, so the component build dies with a
+                                SyntaxError that points into node_modules and
+                                looks nothing like a version problem.
+                            -->
+                            <nodeVersion>v18.19.0</nodeVersion>
+                            <npmVersion>10.2.3</npmVersion>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>npm install</id>
