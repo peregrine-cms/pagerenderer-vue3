@@ -93,15 +93,25 @@
                         </goals>
                         <configuration>
                             <!--
-                                Pinned here on purpose. The peregrine-cms parent
-                                sets node.version to v12.18.3, which predates
-                                optional chaining — @vitejs/plugin-vue fails to
-                                parse on it, so the component build dies with a
-                                SyntaxError that points into node_modules and
-                                looks nothing like a version problem.
+                                Pinned here on purpose, and ahead of the parent.
+                                peregrine-cms sets node.version to v12.18.3,
+                                which predates optional chaining —
+                                @vitejs/plugin-vue does not parse on it, and the
+                                build dies with a SyntaxError pointing into
+                                node_modules that looks nothing like a version
+                                problem.
+
+                                v24 is the current LTS line (Krypton). node is
+                                build-time only — it is not in the runtime image,
+                                which ships Java 25 — so this affects the
+                                toolchain and nothing that gets deployed.
+
+                                npmVersion is deliberately not set: the version
+                                bundled with node is the one it was tested with,
+                                and pinning a second one only adds a download
+                                that can drift out of step.
                             -->
-                            <nodeVersion>v18.19.0</nodeVersion>
-                            <npmVersion>10.2.3</npmVersion>
+                            <nodeVersion>v24.19.0</nodeVersion>
                         </configuration>
                     </execution>
                     <execution>
