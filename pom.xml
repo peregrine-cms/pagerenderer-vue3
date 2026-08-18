@@ -13,6 +13,22 @@
         <relativePath>../peregrine-cms/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <!--
+            The peregrine-cms parent declares frontend-maven-plugin in
+            <build><plugins> with <nodeVersion>${node.version}</nodeVersion>, so
+            the PROPERTY decides which node is installed — an execution-level
+            nodeVersion in ui.apps loses to it. Override it here, once, for both
+            modules.
+
+            v24 is the current LTS (Krypton); the parent is on v20.20.2. node is
+            build-time only — the runtime image ships Java 25 and has no node —
+            so this changes the toolchain and nothing that is deployed.
+        -->
+        <node.version>v24.19.0</node.version>
+        <npm.version>11.17.0</npm.version>
+    </properties>
+
     <artifactId>pagerender-vue3.parent</artifactId>
     <packaging>pom</packaging>
 
